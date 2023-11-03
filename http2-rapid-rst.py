@@ -95,7 +95,7 @@ def checkHTTP2RST(url,):
     # except Exception as err:
     #     return (-1, f'check_http2_rst - {err}')
 
-if __name__ == "__main__"
+if __name__ == "__main__":
         # parser = argparse.ArgumentParser(description='Check HTTP2 Rapid RST')
         # parser.add_argument('-i', '--input', help='Input file', required=True)
         # parser.add_argument('-o', '--output', help='Output file', required=True)
