@@ -108,21 +108,21 @@ if __name__ == "__main__":
         url = input('Enter URL: ')
 
         print(f'[*] Start: {datetime.datetime.now()}')
-        with open(args.output, 'w') as f:
-            writer = csv.writer(f)
-            writer.writerow(['URL', 'HTTP2', 'HTTP2-RST'])
-            for url in data:
-                url = url[0]
-                print(f'[*] Checking {url}')
-                http2 = checkHTTP2(url)
-                http2_rst = checkHTTP2RST(url)
-                writer.writerow([url, http2[0], http2_rst[0]])
+        # with open(args.output, 'w') as f:
+        #     writer = csv.writer(f)
+        #     writer.writerow(['URL', 'HTTP2', 'HTTP2-RST'])
+        for url in data:
+            url = url[0]
+            print(f'[*] Checking {url}')
+            http2 = checkHTTP2(url)
+            http2_rst = checkHTTP2RST(url)
+            writer.writerow([url, http2[0], http2_rst[0]])
 
-                if http2[0] == 1 and http2_rst[0] == 1:
-                    print(f'[+] {url} is HTTP2 Rapid RST')
-                elif http2[0] == 1 and http2_rst[0] == 0:
-                    print(f'[+] {url} is HTTP2 but not Rapid RST')
-                elif http2[0] == 0 and http2_rst[0] == 1:
-                    print(f'[+] {url} is not HTTP2 but Rapid RST')
-                else:
-                    print(f'[-] {url} is not HTTP2 and not Rapid RST')
+            if http2[0] == 1 and http2_rst[0] == 1:
+                print(f'[+] {url} is HTTP2 Rapid RST')
+            elif http2[0] == 1 and http2_rst[0] == 0:
+                print(f'[+] {url} is HTTP2 but not Rapid RST')
+            elif http2[0] == 0 and http2_rst[0] == 1:
+                print(f'[+] {url} is not HTTP2 but Rapid RST')
+            else:
+                print(f'[-] {url} is not HTTP2 and not Rapid RST')
