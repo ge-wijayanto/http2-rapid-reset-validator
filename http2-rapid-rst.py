@@ -31,7 +31,7 @@ def checkHTTP2(url):
 def checkHTTP2RST(url,):
     try:
         context = ssl.create_default_context()
-        context.set_alpn_protocols(['h2'])
+        # context.set_alpn_protocols(['h2'])
         context.check_hostname = False
         context.verify_mode = ssl.CERT_NONE
         ## context.load_default_certs()
