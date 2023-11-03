@@ -116,7 +116,7 @@ if __name__ == "__main__":
         print(f'[*] Checking {url}')
         http2 = checkHTTP2(url)
         http2_rst = checkHTTP2RST(url)
-        writer.writerow([url, http2[0], http2_rst[0]])
+        # writer.writerow([url, http2[0], http2_rst[0]])
 
         if http2[0] == 1 and http2_rst[0] == 1:
             print(f'[+] {url} is HTTP2 Rapid RST')
