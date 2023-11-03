@@ -155,11 +155,11 @@ if __name__ == "__main__":
 
         h2rst = checkHTTP2RST(host,port,path)
 
-        if http2 == 1 and http2_rst == 1:
+        if h2support == 1 and h2rst == 1:
             print(f'[+] {url} is HTTP2 Rapid RST')
-        elif http2 == 1 and http2_rst == 0:
+        elif h2support == 1 and h2rst == 0:
             print(f'[+] {url} is HTTP2 but not Rapid RST')
-        elif http2 == 0 and http2_rst == 1:
+        elif h2support == 0 and h2rst == 1:
             print(f'[+] {url} is not HTTP2 but Rapid RST')
         else:
             print(f'[-] {url} is not HTTP2 and not Rapid RST')
