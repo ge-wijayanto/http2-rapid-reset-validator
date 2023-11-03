@@ -153,13 +153,13 @@ if __name__ == "__main__":
         # http2_rst = checkHTTP2RST(url)
         # writer.writerow([url, http2[0], http2_rst[0]])
 
-        h2rst = checkHTTP2RST(host,port,path)
+        # h2rst = checkHTTP2RST(host,port,path)
 
-        if h2support == 1 and h2rst == 1:
+        if h2support == 1: #and h2rst == 1:
             print(f'[+] {url} is HTTP2 Rapid RST')
-        elif h2support == 1 and h2rst == 0:
-            print(f'[+] {url} is HTTP2 but not Rapid RST')
-        elif h2support == 0 and h2rst == 1:
-            print(f'[+] {url} is not HTTP2 but Rapid RST')
-        else:
-            print(f'[-] {url} is not HTTP2 and not Rapid RST')
+        # elif h2support == 1 and h2rst == 0:
+            # print(f'[+] {url} is HTTP2 but not Rapid RST')
+        # elif h2support == 0 and h2rst == 1:
+            # print(f'[+] {url} is not HTTP2 but Rapid RST')
+        # else:
+            # print(f'[-] {url} is not HTTP2 and not Rapid RST')
