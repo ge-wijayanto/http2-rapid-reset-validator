@@ -4,7 +4,7 @@ import csv
 import socket
 import argparse
 import datetime
-# import urlib.parse
+import urllib.parse
 import http.client
 import h2.connection
 import h2.config
