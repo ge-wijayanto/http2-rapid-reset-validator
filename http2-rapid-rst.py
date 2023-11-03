@@ -28,7 +28,7 @@ def checkHTTP2(url):
     except Exception as err:
         return (-1, f'check_http2_support - {err}')
 
-def checkHTTP2RST(url,):
+def checkHTTP2RST(host,port,path='/',timeout=5):
     try:
         context = ssl.create_default_context()
         # context.set_alpn_protocols(['h2'])
@@ -44,6 +44,8 @@ def checkHTTP2RST(url,):
         # conn.initiate_connection()
         # sock.sendall(conn.data_to_send())
 
+        conn.connect()
+
         conf = h2.config.H2Configuration(client_side=True)
         conn = h2.connection.H2Connection(config=conf)
         conn.initiate_connection()
@@ -54,9 +56,10 @@ def checkHTTP2RST(url,):
 
         headers = [
             (':method', 'GET'),
+            (':authority', host),
             (':scheme', 'https'),
             (':authority', url),
-            (':path', '/')
+            (':path', path)
             # ('user-agent', 'python-hyper/0.7.0')
         ]
         conn.send_headers(1, headers, end_stream=True)
@@ -95,6 +98,35 @@ def checkHTTP2RST(url,):
     # except Exception as err:
     #     return (-1, f'check_http2_rst - {err}')
 
+def sliceURL(url):
+    try:
+        parsed = urllib.parse.urlparse(url)
+        scheme = parsed.scheme
+        path = parsed.path
+        host = parsed.hostname
+        port = parsed.port
+        query = parsed.query
+        fragment = parsed.fragment
+
+        if path == '':
+            path = '/'
+        if query == '':
+            query = None
+        if fragment == '':
+            fragment = None
+        if not host:
+            return (-1, 'Invalid URL')
+        if port:
+            return host, port, path
+        if scheme == 'http':
+            return host, 80, path
+        elif scheme == 'https':
+            return host, 443, path
+
+        return host, (80,443), path
+    except Exception as err:
+        return (-1, f'slice_url - {err}')
+
 if __name__ == "__main__":
         # parser = argparse.ArgumentParser(description='Check HTTP2 Rapid RST')
         # parser.add_argument('-i', '--input', help='Input file', required=True)
@@ -106,6 +138,9 @@ if __name__ == "__main__":
         #     data = list(reader)
 
         url = input('Enter URL: ')
+        
+        h2support, err = checkHTTP2(url)
+        host, port, path = sliceURL(url)
 
         print(f'[*] Start: {datetime.datetime.now()}')
         # with open(args.output, 'w') as f:
@@ -114,9 +149,11 @@ if __name__ == "__main__":
         # for url in data:
         #     url = url[0]
         print(f'[*] Checking {url}')
-        http2 = checkHTTP2(url)
-        http2_rst = checkHTTP2RST(url)
+        # http2 = checkHTTP2(url)
+        # http2_rst = checkHTTP2RST(url)
         # writer.writerow([url, http2[0], http2_rst[0]])
+
+        h2rst = checkHTTP2RST(host,port,path)
 
         if http2 == 1 and http2_rst == 1:
             print(f'[+] {url} is HTTP2 Rapid RST')
