@@ -1,58 +1,49 @@
-import ssl
-import sys
-import csv
-import socket
-import argparse
-import datetime
+import ssl, socket, datetime
 import urllib.parse
 import http.client
-import h2.connection
-import h2.config
+import h2.connection, h2.config
 import httpx
 import requests
+from colorama import Fore, Back, Style
 
+## Check HTTP/2 Support for the Target URL
 def checkHTTP2(url):
     try:
         client_op = {
-            'http2': True,
-            'verify': False
+            'http2': True, # Enable HTTP/2 support
+            'verify': False # Disable SSL verification
         }
 
+        # Send HTTP/2 request
         with httpx.Client(**client_op) as client:
             response = client.get(url)
         
         if response.http_version == 'HTTP/2':
-            return (1, '')
+            return (1, '') # HTTP/2 supported
         else:
-            return (0, f'{response.http_version}')
+            return (0, f'{response.http_version}') # HTTP/2 not supported
     except Exception as err:
-        return (-1, f'check_http2_support - {err}')
+        return (-1, f'check_http2_support - {err}') # Error
 
-def checkHTTP2RST(host,port,path='/',timeout=5):
+## Send HTTP/2 RST_STREAM Frame
+def sendHTTP2RST(host,port,path='/',timeout=5):
     try:
+        # Create an SSL Context
         context = ssl.create_default_context()
-        # context.set_alpn_protocols(['h2'])
-        context.check_hostname = False
-        context.verify_mode = ssl.CERT_NONE
-        ## context.load_default_certs()
+        context.check_hostname = False # Disable hostname verification
+        context.verify_mode = ssl.CERT_NONE # Disable SSL verification
 
-        # sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # sock.settimeout(5)
-        # sock.connect((url, 443))
-        # sock = context.wrap_socket(sock, server_hostname=url)
-        # conn = h2.connection.H2Connection(h2.config.H2Configuration(client_side=False))
-        # conn.initiate_connection()
-        # sock.sendall(conn.data_to_send())
-
+        # Create an HTTP/2 connection
         conn.connect()
 
-        conf = h2.config.H2Configuration(client_side=True)
-        conn = h2.connection.H2Connection(config=conf)
-        conn.initiate_connection()
-        sock = context.wrap_socket(socket.socket(socket.AF_INET), server_hostname=url)
+        # Send HTTP/2 RST_STREAM Frame
+        conf = h2.config.H2Configuration(client_side=True) # Create an H2 Configuration
+        conn = h2.connection.H2Connection(config=conf) # Create an H2 Connection
+        conn.initiate_connection() # Initiate an H2 Connection
+        sock = context.wrap_socket(socket.socket(socket.AF_INET), server_hostname=url) # Create an SSL Socket
         sock.connect((url, 443))
         sock.settimeout(5)
-        sock.sendall(conn.data_to_send())
+        sock.sendall(conn.data_to_send()) # Send an H2 Connection
 
         headers = [
             (':method', 'GET'),
@@ -60,43 +51,30 @@ def checkHTTP2RST(host,port,path='/',timeout=5):
             (':scheme', 'https'),
             (':authority', url),
             (':path', path)
-            # ('user-agent', 'python-hyper/0.7.0')
         ]
-        conn.send_headers(1, headers, end_stream=True)
-        sock.sendall(conn.data_to_send())
+        conn.send_headers(1, headers, end_stream=True) # Send an H2 Request
+        sock.sendall(conn.data_to_send()) # Send an H2 Connection
 
         while True:
             data = sock.recv(65535)
             if not data:
                 break
-            events = conn.receive_data(data)
+            events = conn.receive_data(data) # Receive H2 Events
             sent = False
             for event in events:
-                if isinstance(event, h2.events.StreamReset):
+                if isinstance(event, h2.events.StreamReset): # Check if the event is an H2 RST_STREAM Frame
                     # return (1, '')
                     sent = True
                     break
             if sent:
-                return (1, '')
+                return (1, '') # H2 RST_STREAM Frame sent
             else:
-                return (0, '')
+                return (0, '') # H2 RST_STREAM Frame not sent
         conn.close_connection()
         sock.close()
         return (0, '')
     except Exception as err:
         return (-1, f'check_http2_rst - {err}')
-                
-    #     while True:
-    #         data = sock.recv(65535)
-    #         if not data:
-    #             break
-    #         events = conn.receive_data(data)
-    #         for event in events:
-    #             if isinstance(event, h2.events.StreamReset):
-    #                 return (1, '')
-    #     return (0, '')
-    # except Exception as err:
-    #     return (-1, f'check_http2_rst - {err}')
 
 def sliceURL(url):
     try:
@@ -128,46 +106,22 @@ def sliceURL(url):
         return (-1, f'slice_url - {err}')
 
 if __name__ == "__main__":
-        # parser = argparse.ArgumentParser(description='Check HTTP2 Rapid RST')
-        # parser.add_argument('-i', '--input', help='Input file', required=True)
-        # parser.add_argument('-o', '--output', help='Output file', required=True)
-        # args = parser.parse_args()
-    
-        # with open(args.input, 'r') as f:
-        #     reader = csv.reader(f)
-        #     data = list(reader)
-
         url = input('Enter URL: ')
         
         h2support, err = checkHTTP2(url)
         host, port, path = sliceURL(url)
 
-        print(f'[*] Start: {datetime.datetime.now()}')
-        # with open(args.output, 'w') as f:
-        #     writer = csv.writer(f)
-        #     writer.writerow(['URL', 'HTTP2', 'HTTP2-RST'])
-        # for url in data:
-        #     url = url[0]
-        print(f'[*] Checking {url}')
-        # http2 = checkHTTP2(url)
-        # http2_rst = checkHTTP2RST(url)
-        # writer.writerow([url, http2[0], http2_rst[0]])
+        print(f'[{Fore.CYAN}*{Style.RESET_ALL}] Start: {Fore.CYAN}{datetime.datetime.now()}{Style.RESET_ALL}')
+        print(f'[{Fore.CYAN}!{Style.RESET_ALL}] Checking {Fore.CYAN}{url}{Style.RESET_ALL}')
 
-        h2rst = checkHTTP2RST(host,port,path)
+        h2rst = sendHTTP2RST(host,port,path)
 
-        if h2support == 1: #and h2rst == 1:
-            print(f'[+] {url} is HTTP2')
+        if h2support == 1:
+            print(f'[{Fore.YELLOW}!{Style.RESET_ALL}] {Fore.CYAN}{url}{Style.RESET_ALL} is {Fore.YELLOW}supporting HTTP/2{Style.RESET_ALL}')
             h2rst, err2 = checkHTTP2RST(host,port,path)
             if h2rst == 1:
-                print(f'[+] {url} is vulnerable to HTTP2 Rapid Reset')
+                print(f'[{Fore.RED}!{Style.RESET_ALL}] {Fore.CYAN}{url}{Style.RESET_ALL} is {Fore.RED}VULNERABLE to HTTP/2 Rapid Reset{Style.RESET_ALL}')
             else:
-                print(f'[-] {url} is not vulnerable to HTTP2 Rapid Reset')
+                print(f'[{Fore.GREEN}!{Style.RESET_ALL}] {Fore.CYAN}{url}{Style.RESET_ALL} is {Fore.GREEN}NOT VULNERABLE to HTTP/2 Rapid Reset{Style.RESET_ALL}')
         else:
-            print(f'[-] {url} is not HTTP2')
-            # print(f'[+] {url} is HTTP2 Rapid RST')
-        # elif h2support == 1 and h2rst == 0:
-            # print(f'[+] {url} is HTTP2 but not Rapid RST')
-        # elif h2support == 0 and h2rst == 1:
-            # print(f'[+] {url} is not HTTP2 but Rapid RST')
-        # else:
-            # print(f'[-] {url} is not HTTP2 and not Rapid RST')
+            print(f'[+] {Fore.CYAN}{url}{Style.RESET_ALL} is {Fore.GREEN}not supporting HTTP/2{Style.RESET_ALL}')
