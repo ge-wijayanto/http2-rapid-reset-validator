@@ -118,7 +118,7 @@ if __name__ == "__main__":
 
         if h2support == 1:
             print(f'[{Fore.YELLOW}!{Style.RESET_ALL}] {Fore.CYAN}{url}{Style.RESET_ALL} is {Fore.YELLOW}supporting HTTP/2{Style.RESET_ALL}')
-            h2rst, err2 = checkHTTP2RST(host,port,path)
+            h2rst, err2 = sendHTTP2RST(host,port,path)
             if h2rst == 1:
                 print(f'[{Fore.RED}!{Style.RESET_ALL}] {Fore.CYAN}{url}{Style.RESET_ALL} is {Fore.RED}VULNERABLE to HTTP/2 Rapid Reset{Style.RESET_ALL}')
             else:
