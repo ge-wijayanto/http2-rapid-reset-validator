@@ -10,11 +10,15 @@ This custom script is created to perform Security Validation of the HTTP/2 Rapid
 
 CVE-2023-44487, otherwise known as "HTTP/2 Rapid Reset", is a zero-day vulnerability that allows threat actors to perform DDoS by manipulating the Rapid Reset stream (RST_STREAM) within the multiplexing characteristics of HTTP/2. Multiplexing is a technique used by HTTP/2 to allow multiple simultaneous communications to be performed in a single TCP connection/channel (see figure below), instead of creating different dedicated channels for each exchange, as used in previous HTTP/1.1 version.
 
-![HTTP/2 Multiplexing]()
+![HTTP/2 Multiplexing](img/http-2-multiplexing.png)
+Source: [Cloudflare](https://blog.cloudflare.com/http-2-for-web-developers)
 
 With the multiplexing technique in place, HTTP/2 also employs a method to optimize channel usage, with a method of canceling (or entirely halts) the request using RESET FRAMES, dubbed the "RST_STREAM" frame. This is where the vulnerability is present. Threat actors have found a way to send RST_STREAM directly after the original requests, in an extremely large amount and rapid manner, and in a way that the requests eventually exceeds the keepalive limit for concurrent streams (see figure below). This would result the server utilizing HTTP/2 to become overwhelmed, rendering it useless, thus a successful DDoS attack is performed.
 
-![RST_STREAM VULN]()
+![RST_STREAM VULN](img/http-2-rapid-reset.png)
+Source: [F5 Networks](https://www.f5.com/company/blog/http-2-rapid-reset-attack-impacting-f5-nginx-products)
+
+More info about the CVE can be found [here](https://www.cisa.gov/news-events/alerts/2023/10/10/http2-rapid-reset-vulnerability-cve-2023-44487)
 
 ## Key Features
 This script contains the following key features: 
@@ -26,6 +30,7 @@ This script contains the following key features:
 ## Installation
 ```sh
 git clone https://github.com/ge-wijayanto/http2-rapid-reset-validator.git
+pip install h2 httpx
 ```
 
 ## Usage Guide
@@ -37,4 +42,4 @@ python http2-rapid-rst.py
 ```
 
 ## Result Sample
-![Result Sample 1]()
+![Result Sample](img/sample.png)
