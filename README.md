@@ -1,6 +1,8 @@
 # HTTP/2 Rapid Reset Validator
 
-### DISCLAIMER: This script is created to perform security validation on a zero-day vulnerability to help security professionals to better understand the security posture of their web assets. ANY usage in a malicious manner and the repercussions that comes with it is outside of my responsibility. Use it wisely.
+### DISCLAIMER: This script is created to perform security validation on a zero-day vulnerability, intended to help security professionals to better understand the security posture of their web assets. ANY usage in a malicious manner and the repercussions that comes with it is outside of my responsibility. Use it wisely.
+
+## Description
 
 This custom script is created to perform Security Validation of the HTTP/2 Rapid Reset (CVE-2023-44487) vulnerability on a web server, in a non-intrusive manner. The base logic of this script consists of it sending a single RST_STREAM after trying to establish a TCP channel, and checking to determine whether the vulnerability is present or not.
 
